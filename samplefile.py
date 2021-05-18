@@ -1,7 +1,12 @@
-import concat
-Concat = concat.concat("Obrid_AE", "data")
-Concat.output_data("sample_data")
-Concat = concat.concat("Obrid_AE", "test")
-Concat.output_data("sample_test")
+import dataset
+Dataset = dataset.dataset("Obrid_AE", "data")
+Dataset.concat_data("sample_data")
+Dataset = dataset.dataset("Obrid_AE", "test")
 print("----------------------")
-print(Concat.get_data("sample_test").shape)
+Dataset.concat_data("sample_test")
+
+print("----------------------")
+data = Dataset.read_savedata("sample_test")
+print(data.shape[0])
+print("----------------------")
+data, test_data , anomaly_data= Dataset.read_traindata("sample_data", "sample_test", 50, 200, 2)

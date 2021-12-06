@@ -20,7 +20,8 @@ class Modeledit():
         torch.save(model.state_dict(), modelPath)
 
     def read_model(self, model, path):
-        return model.load_state_dict(torch.load(path), strict=False)
+        # return model.load_state_dict(torch.load(path), strict=False)
+        return model.load_state_dict(torch.load(path))
 
 class Autoencoder(nn.Module):
     def __init__(self):

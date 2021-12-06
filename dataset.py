@@ -16,13 +16,14 @@ class dataset():
             pass
         # self.test_data_path = os.path.join(self.Folder_PATH, "test_data", "0503.csv")
 
-    def concat_data(self, outFile_name):
+    def concat_data(self, outFile_name,shape):
         list=[]
         for path in self.All_Files:
             data_df = pd.read_csv(path, header=None, engine="python")
             data = data_df.iloc[3:, 3].reset_index(drop = True).values
             list.append(data)
         frame=pd.DataFrame(list)
+        frame = frame.head(shape)
         out = outFile_name+".csv"
         self.test_data_path = os.path.join(self.Folder_PATH, "test_data", out)
         frame.to_csv(self.test_data_path, index=False, encoding="utf-8")  
@@ -95,4 +96,11 @@ class dataset():
         np.save(filename + "train"+ str(name), train)
         np.save(filename + "test"+ str(name), test)
         np.save(filename + "anomaly"+ str(name), anomaly)
+    def loadnumpy(self,date,name):
+        #dateは保存した日付名,nameは保存名
+        filename = os.path.join(self.Folder_PATH, "test_data", str(date))
+        train=np.load(filename+"train"+str(name)+'.npy')
+        test=np.load(filename+"test"+str(name)+'.npy')
+        anomaly=np.load(filename+"anomaly"+str(name)+'.npy')
+        return train,test,anomaly
         

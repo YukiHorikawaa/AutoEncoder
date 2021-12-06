@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import numpy as np
 
 class Modeledit():
     def __init__(self, Folder_PATH):
@@ -90,6 +91,59 @@ class Autoencoder2(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
+#----------------------BatchNorm----------------------
+class BatchNorm(nn.Module):
+    def __init__(self, shape, epsilon=np.float32(1e-5)):
+        super().__init__()
+        self.gamma = nn.Parameter(torch.tensor(np.ones(shape, dtype='float32')))
+        self.beta = nn.Parameter(torch.tensor(np.zeros(shape, dtype='float32')))
+        self.epsilon = epsilon
+
+    def forward(self, x):
+        mean = torch.mean(x, 1, keepdim=True)
+        std = torch.std(x, 1, keepdim=True)
+        x_normalized = (x - mean) / (std**2 + self.epsilon)**0.5
+        return self.gamma * x_normalized + self.beta
+#----------------------BatchNorm----------------------
+class Autoencoder2_batchNormalization(nn.Module):
+    def __init__(self):
+        super().__init__()
+        #N(バッチサイズ), 784(ピクセル数64x64)
+        self.encoder = nn.Sequential(
+            nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5),
+            # nn.MaxPool1d(kernel_size=5, stride= 3)
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3),
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Flatten(0, -1),
+            # nn.Linear(16, 12), #N,16 -> N,12
+            # nn.ReLU(),
+            # nn.Linear(12, 3), #N,12 -> N,3\
+            nn.Linear(16, 3), #N,16 -> N,12
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(3,  16),
+            # nn.Linear(3, 12), #N,784 -> N,128
+            # nn.ReLU(),
+            # nn.Linear(12, 16), 
+            BatchNorm((16,3)),
+            nn.ReLU(),
+            nn.Unflatten(0, (1, 1 ,16)),
+            nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3, output_padding=1),
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5, padding = 1, output_padding=1),
+            # nn.Flatten(0, -1),
+            # nn.ReLU(),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
 #ーーーーーーーーーーーーー以下学習がうまく行かなかったーーーーーーーーーーーーーーーーーーーーーーー
 class Autoencoder0512(nn.Module):
     def __init__(self):

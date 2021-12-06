@@ -104,3 +104,28 @@ class dataset():
         anomaly=np.load(filename+"anomaly"+str(name)+'.npy')
         return train,test,anomaly
         
+    def read_traindata_ocs(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
+        #outfile : 読み込むCSVファイル名
+        #epoch_num : エポック数
+        #epoch_size : エポックサイズ    
+        #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        data = self.read_savedata(out_file)
+        anomaly_data = self.read_savedata(Anomaly_file)
+        print(data.max(), data.min())
+        #前処理正規化
+        data = self.preprocessing(data)
+        anomaly_data = self.preprocessing(anomaly_data)
+        #学習データとテストデータの分割
+        rate = 1 - (ratenum/10)
+        print("rate", rate)
+        RateData = int(data.shape[0] * rate)
+        print("data.shape[0]:", data.shape[0])
+        print("rate", RateData)
+        
+        train_data = data[:RateData]
+        test = data[RateData:]
+        print("TrainData", train_data.shape)
+        print("TestData", test.shape)
+        print("ÄnomalyDta", anomaly_data.shape)
+        #学習用データ、テスト用データ、　異常検知のためのテストデータ
+        return train_data, test, anomaly_data

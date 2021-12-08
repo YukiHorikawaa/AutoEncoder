@@ -79,7 +79,20 @@ class dataset():
         print("ÄnomalyDta", anomaly_data.shape)
         #学習用データ、テスト用データ、　異常検知のためのテストデータ
         return train_data, test, anomaly_data
+
+
+    def read_train(self, out_file):
+        #outfile : 読み込むCSVファイル名
+        #epoch_num : エポック数
+        #epoch_size : エポックサイズ    
+        #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        data = self.read_savedata(out_file)
+        print(data.max(), data.min())
+        #前処理正規化
+        data = self.preprocessing(data)
+        return data
     
+
     #前処理
     def preprocessing(self, input):
         #今回は正規化

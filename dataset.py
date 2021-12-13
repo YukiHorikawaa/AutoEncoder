@@ -80,6 +80,10 @@ class dataset():
         #学習用データ、テスト用データ、　異常検知のためのテストデータ
         return train_data, test, anomaly_data
 
+    def Augmentation(self, data):
+        
+        pass
+
 
     def read_train(self, out_file):
         #outfile : 読み込むCSVファイル名

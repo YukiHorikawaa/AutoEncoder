@@ -274,9 +274,9 @@ class VAE_cnn_drop_net(nn.Module):
         super(VAE_cnn_drop_net, self).__init__()
         self.device = device
         self.enc1 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5)
-        self.enc1_drop = nn.Dropout(p=0.5)  # [new] Dropoutを追加してみる
+        self.enc1_drop = nn.Dropout(p=0.2)  # [new] Dropoutを追加してみる
         self.enc2 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3)
-        self.enc2_drop = nn.Dropout(p=0.5)  # [new] Dropoutを追加してみる
+        self.enc2_drop = nn.Dropout(p=0.2)  # [new] Dropoutを追加してみる
         self.flat = nn.Flatten(0, -1)
         self.enc3 = nn.Linear(16, z_dim)
 
@@ -286,9 +286,9 @@ class VAE_cnn_drop_net(nn.Module):
         # self.dec1 = nn.Linear(z_dim, 200)
         self.dec1 = nn.Linear(z_dim,  16)
         self.unflat = nn.Unflatten(0, (1, 1 ,16))
-        self.dec1_drop = nn.Dropout(p=0.5)  # [new] Dropoutを追加してみる
+        self.dec1_drop = nn.Dropout(p=0.2)  # [new] Dropoutを追加してみる
         self.dec2 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3, output_padding=1)
-        self.dec2_drop = nn.Dropout(p=0.5)  # [new] Dropoutを追加してみる
+        self.dec2_drop = nn.Dropout(p=0.2)  # [new] Dropoutを追加してみる
         self.dec3 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5, padding = 1, output_padding=1)
 
 

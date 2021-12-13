@@ -185,6 +185,108 @@ class Autoencoder0512(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
+
+class Autoencoder_batchnorm(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.enc1 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5)
+        self.enc2 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3)
+        self.flat = nn.Flatten(0, -1)
+        self.enc3 = nn.Linear(16, 3)
+
+        self.dec1 = nn.Linear(3,  16)
+        self.unflat = nn.Unflatten(0, (1, 1 ,16))
+        self.dec2 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3, output_padding=1)
+        self.dec3 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5, padding = 1, output_padding=1)
+
+    def encoder(self, x):
+        x = F.relu(self.enc1(x))
+        BatchNorm((1, 1, 50))
+        # print(x.shape)
+        x = F.relu(self.enc2(x))
+        BatchNorm((1, 1, 16))
+        # print(x.shape)
+        x = self.flat(x)
+        x = self.enc3(x)
+        return x
+    def decoder(self, x):
+        x = F.relu(self.dec1(x))
+        BatchNorm((16))
+        # print(x.shape)
+        x = self.unflat(x)
+        x = F.relu(self.dec2(x))
+        BatchNorm((1, 1, 51))
+        # print(x.shape)
+        x = torch.sigmoid(self.dec3(x))
+        return x
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+
+class VAE_cnn(nn.Module):
+    """
+    CNN層を用いたVAE
+    """
+    def __init__(self, z_dim, device):
+        super(VAE_cnn, self).__init__()
+        self.device = device
+        self.enc1 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5)
+        self.enc2 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3)
+        self.flat = nn.Flatten(0, -1)
+        self.enc3 = nn.Linear(16, z_dim)
+
+        self.encmean = nn.Linear(16, z_dim)
+        self.encvar = nn.Linear(16, z_dim)
+
+        # self.dec1 = nn.Linear(z_dim, 200)
+        self.dec1 = nn.Linear(z_dim,  16)
+        self.unflat = nn.Unflatten(0, (1, 1 ,16))
+        self.dec2 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3, output_padding=1)
+        self.dec3 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5, padding = 1, output_padding=1)
+
+
+    def _encoder(self, x):
+        x = F.relu(self.enc1(x))
+        x = F.relu(self.enc2(x))
+        x = self.flat(x)
+        mean = self.encmean(x)
+        var = F.softplus(self.encvar(x))
+        return mean, var
+
+    def _sample_z(self, mean, var):
+        epsilon = torch.randn(mean.shape).to(self.device)
+        return mean + torch.sqrt(var) * epsilon
+
+    def _decoder(self, z):
+        x = F.relu(self.dec1(z))
+        x = self.unflat(x)
+        x = F.relu(self.dec2(x))
+        x = torch.sigmoid(self.dec3(x))
+        return x
+
+    def forward(self, x):
+        mean, var = self._encoder(x)
+        z = self._sample_z(mean, var)
+        x = self._decoder(z)
+        return x, z
+
+    def loss(self, x):
+        mean, var = self._encoder(x)
+        # print(mean, var)
+        # KL lossの計算
+        KL = -0.5 * torch.mean(torch.sum(1 + torch_log(var) - mean**2 - var, dim=0))
+        
+        z = self._sample_z(mean, var)
+        y = self._decoder(z)
+
+        # reconstruction lossの計算
+        reconstruction = torch.mean(torch.sum(x * torch_log(y) + (1 - x) * torch_log(1 - y), dim=1))
+
+        return KL, -reconstruction 
+
 # class Autoencoder(nn.Module):
 #     def __init__(self):
 #         super().__init__()

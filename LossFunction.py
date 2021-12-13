@@ -1,8 +1,10 @@
+from numpy.lib import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
+import math
 
 class SSIMLoss(nn.Module):
     def __init__(self):
@@ -10,8 +12,8 @@ class SSIMLoss(nn.Module):
         print("make")
         # 初期化処理
         # self.param = ... 
-    def forward(self, recon_data, x, window = 8, alfa=1,beta=1,gamma=1,c1=0.01,c2=0.03):
-        print("type:x{},recon_data{}".format(type(x),type(recon_data)))
+    def forward(self, recon_data, x, window = 16, alfa=1,beta=1,gamma=1,c1=0.01,c2=0.03):
+        # print("type:x{},recon_data{}".format(type(x),type(recon_data)))
         # print("data:x{},recon_data{}".format(x,recon_data))
         recon_data =  recon_data.flatten().detach().numpy().astype(np.float64)
         x =  x.flatten().detach().numpy().astype(np.float64)
@@ -22,24 +24,40 @@ class SSIMLoss(nn.Module):
         # M = int(input_size/window)
         M = input_size/window
         M = int(M)
-        print("type:x{},recon_data{}".format(type(x),type(recon_data)))
-        print("size:x{},recon_data{}".format(x.shape,recon_data.shape))
+        # print("type:x{},recon_data{}".format(type(x),type(recon_data)))
+        # print("size:x{},recon_data{}".format(x.shape,recon_data.shape))
         for outPos in range(0, input_size+window, window):
             x_batch = x[int(inPos):int(outPos)]
             recon_batch = recon_data[int(inPos):int(outPos)]
             #[in:out]の配列の数がおかしくてエラー
-            print("type:x_batch{},x_batch{}".format(type(x_batch),type(x_batch)))
-            print("size:x_batch{},x_batch{}".format(x_batch.shape,x_batch.shape))
+            # print("type:x_batch{},x_batch{}".format(type(x_batch),type(recon_batch)))
+            # print("size:x_batch{},x_batch{}".format(x_batch.shape,recon_batch.shape))
+            # print("size:x{},x{}".format(x_batch,recon_batch))
             x_mean = np.mean(x_batch)
             recon_mean = np.mean(recon_batch)
             x_std = np.std(x_batch)
             recon_std = np.std(recon_batch)
             #covが二次元なのはおかしい
             x_cov = np.cov([x_batch,recon_batch])
-            SSIM_val += ((2*x_mean*recon_mean+c1)*(2*x_cov+c2))/((x_mean**2+recon_mean**2+c1)*(x_std**2+recon_std**2+c2))
-            outPos = inPos
+            x_cov = x_cov[0,0]**2+x_cov[1,1]**2+x_cov[0,1]**2+x_cov[1,0]**2
+            # print("x_mean:{}r_mean:{}x_std:{}r_std:{}x_cov:{}".format(x_mean,recon_mean,x_std,recon_std,x_cov))
+            # SSIM_val += ((2*x_mean*recon_mean+c1)*(2*x_cov+c2))/((x_mean**2+recon_mean**2+c1)*(x_std**2+recon_std**2+c2))
+            #共分散が発散してしまい、nanになるため
+            # print("(2*x_mean*recon_mean+c1)",(2*x_mean*recon_mean+c1))
+            # print("(x_mean**2+recon_mean**2+c1)",(x_mean**2+recon_mean**2+c1))
+            # print("(x_std**2+recon_std**2+c2)",(x_std**2+recon_std**2+c2))
+            # print("((x_mean**2+recon_mean**2+c1)*(x_std**2+recon_std**2+c2))",((x_mean**2+recon_mean**2+c1)*(x_std**2+recon_std**2+c2)))
+            # loss_data = (2*x_mean*recon_mean+c1)/((x_mean**2+recon_mean**2+c1)*(x_std**2+recon_std**2+c2))
+            loss_data = ((2*x_mean*recon_mean+c1)*(2*x_cov+c2))/((x_mean**2+recon_mean**2+c1)*(x_std**2+recon_std**2+c2))
+            # print("loss_data",loss_data)
+            if math.isnan(loss_data):
+                # print("SSIM_val","error")
+                pass
+            else:
+                SSIM_val += loss_data
+                # print("SSIM_val",SSIM_val)
+            inPos = outPos
         out = SSIM_val/M
-        print(out)
-        print(out.shape)
-        out = torch.tensor(int(out), requires_grad=True)
+        # print(out)
+        out = torch.tensor(out, requires_grad=True)
         return out

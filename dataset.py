@@ -142,15 +142,19 @@ class dataset():
             list.append(self.Augmentation_minus(train_data[i], 0.2, 0.15))
             list.append(self.Augmentation_plus(train_data[i], 0.2, 0.2))
             list.append(self.Augmentation_minus(train_data[i], 0.2, 0.2))
-        train_data = np.array(list)
+        train_data = list
 
-        list=[]
+        out_list=[]
+        # ランダムサンプリング
         for i in range(epoch_num):
-            #ランダムに配列の番号をランダムに指定
-            make_epoch = np.random.randint(0, len(train_data), (epoch_size))
-            #ランダムに指定した番号のデータを選択、リストに追加
-            list.append(train_data[make_epoch, :])
-        train_data = np.array(list)
+            small = random.sample(train_data, epoch_size)
+            out_list.append(small)
+        # for i in range(epoch_num):
+        #     #ランダムに配列の番号をランダムに指定
+        #     make_epoch = np.random.randint(0, len(train_data), (epoch_size))
+        #     #ランダムに指定した番号のデータを選択、リストに追加
+        #     out_list.append(train_data[make_epoch, :])
+        train_data = np.array(out_list)
         # conv1を適用するために３次元
         train_data = train_data[:, :, np.newaxis, np.newaxis, :]
         # test_data = np.array(list)/1024

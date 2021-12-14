@@ -126,43 +126,67 @@ class dataset():
         train_data = data[:RateData]
         test = data[RateData:]
         #Augmentation
-        list=[]
+        auged_data=[]
         for i in range(train_data.shape[0]):
-            list.append(self.Augmentation_noise(train_data[i]))
-            list.append(self.Augmentation_plus(train_data[i], 0.1))
-            list.append(self.Augmentation_minus(train_data[i], 0.1))
-            list.append(self.Augmentation_plus(train_data[i], 0.15))
-            list.append(self.Augmentation_minus(train_data[i], 0.15))
-            list.append(self.Augmentation_plus(train_data[i], 0.2))
-            list.append(self.Augmentation_minus(train_data[i], 0.2))
-            list.append(self.Augmentation_noise(train_data[i], 0.2))
-            list.append(self.Augmentation_plus(train_data[i], 0.2, 0.1))
-            list.append(self.Augmentation_minus(train_data[i], 0.2, 0.1))
-            list.append(self.Augmentation_plus(train_data[i], 0.2, 0.15))
-            list.append(self.Augmentation_minus(train_data[i], 0.2, 0.15))
-            list.append(self.Augmentation_plus(train_data[i], 0.2, 0.2))
-            list.append(self.Augmentation_minus(train_data[i], 0.2, 0.2))
-        train_data = list
-
+            auged_data.append(self.Augmentation_noise(train_data[i]))
+            auged_data.append(self.Augmentation_plus(train_data[i], 0.1))
+            auged_data.append(self.Augmentation_minus(train_data[i], 0.1))
+            auged_data.append(self.Augmentation_plus(train_data[i], 0.15))
+            auged_data.append(self.Augmentation_minus(train_data[i], 0.15))
+            auged_data.append(self.Augmentation_plus(train_data[i], 0.2))
+            auged_data.append(self.Augmentation_minus(train_data[i], 0.2))
+            auged_data.append(self.Augmentation_noise(train_data[i], 0.2))
+            auged_data.append(self.Augmentation_plus(train_data[i], 0.2, 0.1))
+            auged_data.append(self.Augmentation_minus(train_data[i], 0.2, 0.1))
+            auged_data.append(self.Augmentation_plus(train_data[i], 0.2, 0.15))
+            auged_data.append(self.Augmentation_minus(train_data[i], 0.2, 0.15))
+            auged_data.append(self.Augmentation_plus(train_data[i], 0.2, 0.2))
+            auged_data.append(self.Augmentation_minus(train_data[i], 0.2, 0.2))
+        random.seed(0)
+        random.shuffle(auged_data)
+        ori_data = []
+        for i in range(train_data.shape[0]):
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+            ori_data.append(train_data[i])
+        random.seed(0)
+        random.shuffle(ori_data)
+        auged_data = np.array(auged_data)
+        ori_data = np.array(ori_data)
         out_list=[]
-        # ランダムサンプリング
-        for i in range(epoch_num):
-            small = random.sample(train_data, epoch_size)
-            out_list.append(small)
+        ori_list = []
+        # # ランダムサンプリング
         # for i in range(epoch_num):
-        #     #ランダムに配列の番号をランダムに指定
-        #     make_epoch = np.random.randint(0, len(train_data), (epoch_size))
-        #     #ランダムに指定した番号のデータを選択、リストに追加
-        #     out_list.append(train_data[make_epoch, :])
+        #     out_list.append(random.sample(auged_data, epoch_size))
+        #     ori_list.append(random.sample(ori_data, epoch_size))
+        for i in range(epoch_num):
+            #ランダムに配列の番号をランダムに指定
+            make_epoch = np.random.randint(0, len(auged_data), (epoch_size))
+            #ランダムに指定した番号のデータを選択、リストに追加
+            out_list.append(auged_data[make_epoch, :])
+            ori_list.append(ori_data[make_epoch, :])
         train_data = np.array(out_list)
+        ori_data = np.array(ori_list)
         # conv1を適用するために３次元
         train_data = train_data[:, :, np.newaxis, np.newaxis, :]
+        ori_data = ori_data[:, :, np.newaxis, np.newaxis, :]
         # test_data = np.array(list)/1024
         print("TrainData", train_data.shape)
         print("TestData", test.shape)
         print("ÄnomalyDta", anomaly_data.shape)
         #学習用データ、テスト用データ、　異常検知のためのテストデータ
-        return train_data, test, anomaly_data
+        return train_data, ori_data, test, anomaly_data
 
     def read_train(self, out_file):
         #outfile : 読み込むCSVファイル名

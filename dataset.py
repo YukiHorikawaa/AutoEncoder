@@ -80,7 +80,7 @@ class dataset():
         print("ÄnomalyDta", anomaly_data.shape)
         #学習用データ、テスト用データ、　異常検知のためのテストデータ
         return train_data, test, anomaly_data
-
+    #-----------------------------------------------------for Augmentation------------------------------------------------------------------
     def Augmentation_noise(self, data, rate=0.1):
         data = np.array(data)
         data_max = np.max(data)
@@ -105,6 +105,7 @@ class dataset():
         # out = data + np.random.rand(0, data_max*rate, num)
         out = data + randdata - minus
         return out
+    #-----------------------------------------------------for Augmentation------------------------------------------------------------------
     def read_Auged_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
         #outfile : 読み込むCSVファイル名
         #epoch_num : エポック数
@@ -187,6 +188,70 @@ class dataset():
         print("ÄnomalyDta", anomaly_data.shape)
         #学習用データ、テスト用データ、　異常検知のためのテストデータ
         return train_data, ori_data, test, anomaly_data
+
+    #-----------------------------------------------------for Augmentation------------------------------------------------------------------
+    def read_noised_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
+        #outfile : 読み込むCSVファイル名
+        #epoch_num : エポック数
+        #epoch_size : エポックサイズ    
+        #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        data = self.read_savedata(out_file)
+        anomaly_data = self.read_savedata(Anomaly_file)
+        print(data.max(), data.min())
+        #前処理正規化
+        data = self.preprocessing(data)
+        anomaly_data = self.preprocessing(anomaly_data)
+        #学習データとテストデータの分割
+        rate = 1 - (ratenum/10)
+        print("rate", rate)
+        RateData = int(data.shape[0] * rate)
+        print("data.shape[0]:", data.shape[0])
+        print("rate", RateData)
+        
+        train_data = data[:RateData]
+        test = data[RateData:]
+        #Augmentation
+        auged_data=[]
+        for i in range(train_data.shape[0]):
+            auged_data.append(self.Augmentation_noise(train_data[i]))
+            auged_data.append(self.Augmentation_noise(train_data[i], 0.05))
+            auged_data.append(self.Augmentation_noise(train_data[i], 0.15))
+            auged_data.append(self.Augmentation_noise(train_data[i], 0.2))
+        random.seed(0)
+        random.shuffle(auged_data)
+        ori_data = []
+        times = 4
+        for i in range(train_data.shape[0]):
+            for j in range(times):
+                ori_data.append(train_data[i])
+        random.seed(0)
+        random.shuffle(ori_data)
+        auged_data = np.array(auged_data)
+        ori_data = np.array(ori_data)
+        out_list=[]
+        ori_list = []
+        # # ランダムサンプリング
+        # for i in range(epoch_num):
+        #     out_list.append(random.sample(auged_data, epoch_size))
+        #     ori_list.append(random.sample(ori_data, epoch_size))
+        for i in range(epoch_num):
+            #ランダムに配列の番号をランダムに指定
+            make_epoch = np.random.randint(0, len(auged_data), (epoch_size))
+            #ランダムに指定した番号のデータを選択、リストに追加
+            out_list.append(auged_data[make_epoch, :])
+            ori_list.append(ori_data[make_epoch, :])
+        train_data = np.array(out_list)
+        ori_data = np.array(ori_list)
+        # conv1を適用するために３次元
+        train_data = train_data[:, :, np.newaxis, np.newaxis, :]
+        ori_data = ori_data[:, :, np.newaxis, np.newaxis, :]
+        # test_data = np.array(list)/1024
+        print("TrainData", train_data.shape)
+        print("TestData", test.shape)
+        print("ÄnomalyDta", anomaly_data.shape)
+        #学習用データ、テスト用データ、　異常検知のためのテストデータ
+        return train_data, ori_data, test, anomaly_data
+
 
     def read_train(self, out_file):
         #outfile : 読み込むCSVファイル名

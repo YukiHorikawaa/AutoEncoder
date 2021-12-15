@@ -7,17 +7,18 @@ import torch.optim as optim
 import numpy as np
 
 class Modeledit():
-    def __init__(self, Folder_PATH):
+    def __init__(self, Folder_PATH, model_name):
         self.Folder_PATH =  Folder_PATH
+        self.model_name = model_name
         self.now = dt.datetime.now()
-        self.filename = os.path.join(self.Folder_PATH, "model_data", self.now.strftime('%Y%m%d'))
+        self.filename = os.path.join(self.Folder_PATH, self.model_name, self.now.strftime('%Y%m%d'))
         try:
             os.makedirs(self.filename)
         except FileExistsError:
             pass
         # モデル保存
-    def save_model(self, model, name):
-        modelPath = os.path.join(self.filename, name + ".pth")
+    def save_model(self, model):
+        modelPath = os.path.join(self.filename, self.model_name + self.now.strftime('%H%M%S') + ".pth")
         torch.save(model.state_dict(), modelPath)
 
     def read_model(self, model, path):
@@ -55,7 +56,10 @@ class Autoencoder(nn.Module):
             nn.Sigmoid(),
         )
     
-class Autoencoder2(nn.Module):
+class Autoencoder_cnn(nn.Module):
+    """
+    CNN+AE
+    """
     def __init__(self):
         super().__init__()
         #N(バッチサイズ), 784(ピクセル数64x64)

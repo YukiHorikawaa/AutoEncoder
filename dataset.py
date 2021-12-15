@@ -45,10 +45,13 @@ class dataset():
         return data
 
     def read_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
-        #outfile : 読み込むCSVファイル名
-        #epoch_num : エポック数
-        #epoch_size : エポックサイズ    
-        #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        """
+        学習用データセット
+        outfile : 読み込むCSVファイル名
+        epoch_num : エポック数
+        epoch_size : エポックサイズ    
+        ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        """
         data = self.read_savedata(out_file)
         anomaly_data = self.read_savedata(Anomaly_file)
         print(data.max(), data.min())
@@ -107,10 +110,13 @@ class dataset():
         return out
     #-----------------------------------------------------for Augmentation------------------------------------------------------------------
     def read_Auged_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
-        #outfile : 読み込むCSVファイル名
-        #epoch_num : エポック数
-        #epoch_size : エポックサイズ    
-        #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        """
+        データ拡張されたデータセット
+        outfile : 読み込むCSVファイル名
+        epoch_num : エポック数
+        epoch_size : エポックサイズ    
+        ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        """
         data = self.read_savedata(out_file)
         anomaly_data = self.read_savedata(Anomaly_file)
         print(data.max(), data.min())
@@ -191,10 +197,13 @@ class dataset():
 
     #-----------------------------------------------------for Augmentation------------------------------------------------------------------
     def read_noised_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
-        #outfile : 読み込むCSVファイル名
-        #epoch_num : エポック数
-        #epoch_size : エポックサイズ    
-        #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        """
+        Denoising AutoEencoderのためのデータセット
+        outfile : 読み込むCSVファイル名
+        epoch_num : エポック数
+        epoch_size : エポックサイズ    
+        ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        """
         data = self.read_savedata(out_file)
         anomaly_data = self.read_savedata(Anomaly_file)
         print(data.max(), data.min())

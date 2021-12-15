@@ -17,6 +17,9 @@ def ori_cov(x,y,x_mean,y_mean,data_len):
 
 
 class SSIMLoss(nn.Module):
+    """
+    画像処理で用いられる評価式を用いたLoss関数
+    """
     def __init__(self):
         super().__init__()
         print("make")

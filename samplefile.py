@@ -10,3 +10,5 @@ data = Dataset.read_savedata("sample_test")
 print(data.shape[0])
 print("----------------------")
 data, test_data , anomaly_data= Dataset.read_traindata("sample_data", "sample_test", 50, 200, 2)
+
+# ランダムに配列を生成する  

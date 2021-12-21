@@ -88,7 +88,8 @@ class dataset():
         data = np.array(data)
         data_max = np.max(data)
         num = data.shape[0]
-        randdata = [random.uniform(0, data_max*rate) for i in range(num)]
+        edge = data_max*rate/2
+        randdata = [random.uniform(-edge, edge) for i in range(num)]
         # out = data + np.random.rand(0, data_max*rate, num)
         out = data + randdata
         return out
@@ -96,7 +97,8 @@ class dataset():
         data = np.array(data)
         data_max = np.max(data)
         num = data.shape[0]
-        randdata = [random.uniform(0, data_max*rate) for i in range(num)]
+        edge = data_max*rate/2
+        randdata = [random.uniform(-edge, edge) for i in range(num)]
         # out = data + np.random.rand(0, data_max*rate, num)
         out = data + randdata + plus
         return out
@@ -104,7 +106,8 @@ class dataset():
         data = np.array(data)
         data_max = np.max(data)
         num = data.shape[0]
-        randdata = [random.uniform(0, data_max*rate) for i in range(num)]
+        edge = data_max*rate/2
+        randdata = [random.uniform(-edge, edge) for i in range(num)]
         # out = data + np.random.rand(0, data_max*rate, num)
         out = data + randdata - minus
         return out

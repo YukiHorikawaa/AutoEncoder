@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import random
 class dataset():
-    def __init__(self, folder_path, file_name):
+    def __init__(self, folder_path = "", file_name = ""):
         self.Folder_PATH = folder_path
         self.DATA_PATH = os.path.join(self.Folder_PATH, file_name, "*/*.csv")
         self.All_Files = glob.glob(self.DATA_PATH)
@@ -44,16 +44,26 @@ class dataset():
         print(data.shape)
         return data
 
-    def read_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
+    def read_npydata(self, path):
+        data = np.load(path)
+        return data
+
+    def read_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum, readType = False):
         """
         学習用データセット
         outfile : 読み込むCSVファイル名
         epoch_num : エポック数
         epoch_size : エポックサイズ    
         ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        readType:npyで読むかCSVで読むか
         """
-        data = self.read_savedata(out_file)
-        anomaly_data = self.read_savedata(Anomaly_file)
+        if readType:
+            data = self.read_savedata(out_file)
+            anomaly_data = self.read_savedata(Anomaly_file)
+        else:
+            data = self.read_npydata(out_file)
+            anomaly_data = self.read_npydata(Anomaly_file)
+
         print(data.max(), data.min())
         #前処理正規化
         data = self.preprocessing(data)
@@ -112,7 +122,7 @@ class dataset():
         out = data + randdata - minus
         return out
     #-----------------------------------------------------for Augmentation------------------------------------------------------------------
-    def read_Auged_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
+    def read_Auged_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum,readType = False):
         """
         データ拡張されたデータセット
         outfile : 読み込むCSVファイル名
@@ -120,8 +130,12 @@ class dataset():
         epoch_size : エポックサイズ    
         ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
         """
-        data = self.read_savedata(out_file)
-        anomaly_data = self.read_savedata(Anomaly_file)
+        if readType:
+            data = self.read_savedata(out_file)
+            anomaly_data = self.read_savedata(Anomaly_file)
+        else:
+            data = self.read_npydata(out_file)
+            anomaly_data = self.read_npydata(Anomaly_file)
         print(data.max(), data.min())
         #前処理正規化
         data = self.preprocessing(data)
@@ -199,7 +213,7 @@ class dataset():
         return train_data, ori_data, test, anomaly_data
 
     #-----------------------------------------------------for Augmentation------------------------------------------------------------------
-    def read_noised_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
+    def read_noised_traindata(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum,readType = False):
         """
         Denoising AutoEencoderのためのデータセット
         outfile : 読み込むCSVファイル名
@@ -207,8 +221,12 @@ class dataset():
         epoch_size : エポックサイズ    
         ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
         """
-        data = self.read_savedata(out_file)
-        anomaly_data = self.read_savedata(Anomaly_file)
+        if readType:
+            data = self.read_savedata(out_file)
+            anomaly_data = self.read_savedata(Anomaly_file)
+        else:
+            data = self.read_npydata(out_file)
+            anomaly_data = self.read_npydata(Anomaly_file)
         print(data.max(), data.min())
         #前処理正規化
         data = self.preprocessing(data)
@@ -301,13 +319,17 @@ class dataset():
         anomaly=np.load(filename+"anomaly"+str(name)+'.npy')
         return train,test,anomaly
         
-    def read_traindata_ocs(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum):
+    def read_traindata_ocs(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum,readType=False):
         #outfile : 読み込むCSVファイル名
         #epoch_num : エポック数
         #epoch_size : エポックサイズ    
         #ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
-        data = self.read_savedata(out_file)
-        anomaly_data = self.read_savedata(Anomaly_file)
+        if readType:
+            data = self.read_savedata(out_file)
+            anomaly_data = self.read_savedata(Anomaly_file)
+        else:
+            data = self.read_npydata(out_file)
+            anomaly_data = self.read_npydata(Anomaly_file)
         print(data.max(), data.min())
         #前処理正規化
         data = self.preprocessing(data)

@@ -6,16 +6,19 @@ import pandas as pd
 import numpy as np
 import random
 class dataset():
-    def __init__(self, folder_path = "", file_name = ""):
-        self.Folder_PATH = folder_path
-        self.DATA_PATH = os.path.join(self.Folder_PATH, file_name, "*/*.csv")
-        self.All_Files = glob.glob(self.DATA_PATH)
-        self.test_data_path = None
-        try:
-            os.makedirs(os.path.join(self.Folder_PATH, "test_data"))
-        except FileExistsError:
+    def __init__(self, folder_path = "", file_name = "", npyFlag = False):
+        if npyFlag:
             pass
-        # self.test_data_path = os.path.join(self.Folder_PATH, "test_data", "0503.csv")
+        else:
+            self.Folder_PATH = folder_path
+            self.DATA_PATH = os.path.join(self.Folder_PATH, file_name, "*/*.csv")
+            self.All_Files = glob.glob(self.DATA_PATH)
+            self.test_data_path = None
+            try:
+                os.makedirs(os.path.join(self.Folder_PATH, "test_data"))
+            except FileExistsError:
+                pass
+            # self.test_data_path = os.path.join(self.Folder_PATH, "test_data", "0503.csv")
 
     def concat_data(self, outFile_name,shape):
         list=[]

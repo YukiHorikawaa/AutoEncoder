@@ -48,6 +48,7 @@ def get_csvdata(path, numpy_flag = True):
         data = data[:, 0:256]
     except IndexError:
         pass
+    data = np.array(data, dtype=np.int)
     return data
 #------------csvの読み込み-------------
 def get_csv_oneline(path, numpy_flag = False):
@@ -58,7 +59,7 @@ def get_csv_oneline(path, numpy_flag = False):
             reader = csv.reader(f)
             list = [row for row in reader]
             list = list[0][0:256]
-            list = np.array(list, dtype=np.int64)
+            list = np.array(list, dtype=np.int)
             print("list_data")
             print(list.shape, list.dtype)
             print(list)
@@ -149,7 +150,9 @@ class ReadCsvTimeSeriesData():
                         self.F_y = get_csvdata(self.pathPairList[i][0], numpy_flag=False)
                         self.B_y = get_csv_oneline(self.pathPairList[i][1], numpy_flag=False)
                         for j in range(self.F_y.shape[0]):
-                            # self.F_y[i, :] = abs(self.F_y[i, :] - self.B_y)
+                            # print("Brightness", self.F_y[i, :], self.F_y[i, :].shape, type(self.F_y[i, :]))
+                            # print("BG", self.B_y, self.B_y.shape, type(self.B_y))
+                            self.F_y[j, :] = abs(self.F_y[j, :] - self.B_y)
                             pass
                         print("Shape:{}".format(self.B_y.shape))
                         print("Type:{}".format(type(self.B_y)))
@@ -166,11 +169,14 @@ class ReadCsvTimeSeriesData():
                             # savemodel.post(self.B_y)
                             pass
                     print("OK_made_train_data")
-                    np.save(self.folderPath + "/train.npy", outTrain.astype('float32'))
+                    np.save(self.folderPath + "/train.npy", outTrain.astype('int'))
+                    np.savetxt(self.folderPath + "/train.csv", outTrain.astype('int'), delimiter=',')
                 
             except UnicodeDecodeError:
                 print("すでにCSVからNPYへの変換は終えています。")
         print("DataSetPath:{}".format(self.pathPairList))
+
+
     def out_csv(self, newfolder = ""):
         print("///////////-------------------------------")
         train = []
@@ -205,7 +211,8 @@ class ReadCsvTimeSeriesData():
                 outTrain = self.y
             else:
                 outTrain = np.vstack([outTrain, self.y])
-        np.save(self.folderPath + "/anomaly.npy", outTrain.astype('float32'))
+        np.save(self.folderPath + "/anomaly.npy", outTrain.astype('int'))
+        np.savetxt(self.folderPath + "/anomaly.csv", outTrain.astype('int'), delimiter=',')
         print(self.pathPairList)
         print(outTrain.shape)
         print("OK_made_anomaly_data")
@@ -262,8 +269,8 @@ def readHamamatsuTrain():
     train = ReadCsvTimeSeriesData("/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/SensorData/1224NewSensorData/1224Data_train",npyFlag = 0, anomalyData=False)
     print("///////////////////////////////////////////////")
     train.read_csv()
-    anomaly = ReadCsvTimeSeriesData("/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/SensorData/1224NewSensorData/1224Data_anomaly",npyFlag = 0, anomalyData=True)
-    anomaly.read_anomaly()
+    # anomaly = ReadCsvTimeSeriesData("/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/SensorData/1224NewSensorData/1224Data_anomaly",npyFlag = 0, anomalyData=True)
+    # anomaly.read_anomaly()
 
 readHamamatsuTrain()
 # DATA = np.load("/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/SensorData/1224NewSensorData/1224Data_train/train.npy")

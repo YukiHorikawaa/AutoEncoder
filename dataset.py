@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import random
 class dataset():
-    def __init__(self, folder_path = "", file_name = "", npyFlag = False):
+    def __init__(self,folder_path = "", file_name = "", npyFlag = False):
         if npyFlag:
             pass
         else:
@@ -40,8 +40,11 @@ class dataset():
         data_df = pd.read_csv(data_path, engine="python")
         return data_df.values
 
-    def read_savedata(self, out_file):
-        csv_pass = os.path.join(self.Folder_PATH, "test_data", out_file + ".csv")
+    def read_savedata(self, out_file = "", oriPath = True):
+        if oriPath:
+            csv_pass = os.path.join(self.Folder_PATH, "test_data", out_file + ".csv")
+        else:
+            csv_pass = out_file
         data_df = pd.read_csv(csv_pass, engine="python")
         data = data_df.values
         print(data.shape)
@@ -134,8 +137,8 @@ class dataset():
         ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
         """
         if readType:
-            data = self.read_savedata(out_file)
-            anomaly_data = self.read_savedata(Anomaly_file)
+            data = self.read_savedata(out_file, oriPath=False)
+            anomaly_data = self.read_savedata(Anomaly_file, oriPath=False)
         else:
             data = self.read_npydata(out_file)
             anomaly_data = self.read_npydata(Anomaly_file)
@@ -225,8 +228,8 @@ class dataset():
         ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
         """
         if readType:
-            data = self.read_savedata(out_file)
-            anomaly_data = self.read_savedata(Anomaly_file)
+            data = self.read_savedata(out_file, oriPath=False)
+            anomaly_data = self.read_savedata(Anomaly_file, oriPath=False)
         else:
             data = self.read_npydata(out_file)
             anomaly_data = self.read_npydata(Anomaly_file)

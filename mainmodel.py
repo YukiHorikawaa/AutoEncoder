@@ -109,6 +109,76 @@ class BatchNorm(nn.Module):
         x_normalized = (x - mean) / (std**2 + self.epsilon)**0.5
         return self.gamma * x_normalized + self.beta
 #----------------------BatchNorm----------------------
+
+class Autoencoder_Linear(nn.Module):
+    def __init__(self):
+        """
+        修論で使用全結合層構成のAE
+        """
+        super().__init__()
+        #N(バッチサイズ), 784(ピクセル数64x64)
+        self.encoder = nn.Sequential(
+            nn.Linear(256, 128), #N,256 -> N,128
+            nn.ReLU(),
+            nn.Linear(128, 64), #N,128 -> N,64
+            nn.ReLU(),
+            nn.Linear(64, 12), #N,64 -> N,12
+            nn.ReLU(),
+            nn.Linear(12, 5), #N,12 -> N,5
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(5, 12), #N,5 -> N,12
+            nn.ReLU(),
+            nn.Linear(12, 64), #N,12 -> N,64
+            nn.ReLU(),
+            nn.Linear(64, 128), #N,64 -> N,128
+            nn.ReLU(),
+            nn.Linear(128, 256), #N,128 -> N,256
+            nn.Sigmoid()
+        )
+    
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+class Autoencoder_Linear_BatchNormal(nn.Module):
+    def __init__(self):
+        """
+        修論で使用全結合層構成のAE
+        """
+        super().__init__()
+        #N(バッチサイズ), 784(ピクセル数64x64)
+        self.encoder = nn.Sequential(
+            nn.Linear(256, 128), #N,256 -> N,128
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Linear(128, 64), #N,128 -> N,64
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Linear(64, 12), #N,64 -> N,12
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Linear(12, 5), #N,12 -> N,5
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(5, 12), #N,5 -> N,12
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Linear(12, 64), #N,12 -> N,64
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Linear(64, 128), #N,64 -> N,128
+            BatchNorm(()),
+            nn.ReLU(),
+            nn.Linear(128, 256), #N,128 -> N,256
+            nn.Sigmoid()
+        )
+    
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
 class Autoencoder2_batchNormalization(nn.Module):
     def __init__(self):
         super().__init__()
@@ -125,14 +195,14 @@ class Autoencoder2_batchNormalization(nn.Module):
             # nn.Linear(16, 12), #N,16 -> N,12
             # nn.ReLU(),
             # nn.Linear(12, 3), #N,12 -> N,3\
-            nn.Linear(16, 3), #N,16 -> N,12
+            nn.Linear(16, 5), #N,16 -> N,12
         )
         self.decoder = nn.Sequential(
-            nn.Linear(3,  16),
-            # nn.Linear(3, 12), #N,784 -> N,128
+            nn.Linear(5,  16),
+            # nn.Linear(5, 12), #N,784 -> N,128
             # nn.ReLU(),
             # nn.Linear(12, 16), 
-            BatchNorm((16,3)),
+            BatchNorm((16,5)),
             nn.ReLU(),
             nn.Unflatten(0, (1, 1 ,16)),
             nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3, output_padding=1),

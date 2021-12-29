@@ -99,6 +99,52 @@ class dataset():
         print("ÄnomalyDta", anomaly_data.shape)
         #学習用データ、テスト用データ、　異常検知のためのテストデータ
         return train_data, test, anomaly_data
+
+
+    def read_traindata_latest(self, out_file, Anomaly_file, epoch_num, epoch_size, ratenum, readType = False):
+        """
+        学習用データセット
+        outfile : 読み込むCSVファイル名
+        epoch_num : エポック数
+        epoch_size : エポックサイズ    
+        ratenum : 学習データとテストデータの割合（ここで指定するのはテストデータの割合）
+        readType:npyで読むかCSVで読むか
+        """
+        if readType:
+            data = self.read_savedata(out_file, oriPath=False)
+            anomaly_data = self.read_savedata(Anomaly_file, oriPath=False)
+        else:
+            data = self.read_npydata(out_file)
+            anomaly_data = self.read_npydata(Anomaly_file)
+        print(data.max(), data.min())
+        #前処理正規化
+        data = self.preprocessing(data)
+        anomaly_data = self.preprocessing(anomaly_data)
+        #学習データとテストデータの分割
+        rate = 1 - (ratenum/10)
+        print("rate", rate)
+        RateData = int(data.shape[0] * rate)
+        print("data.shape[0]:", data.shape[0])
+        print("rate", RateData)
+        
+        train_data = data[:RateData]
+        test = data[RateData:]
+
+        list=[]
+        for i in range(epoch_num):
+            #ランダムに配列の番号をランダムに指定
+            make_epoch = np.random.randint(0, len(train_data), (epoch_size))
+            #ランダムに指定した番号のデータを選択、リストに追加
+            list.append(train_data[make_epoch, :])
+        train_data = np.array(list)
+        # conv1を適用するために３次元
+        train_data = train_data[:, :, np.newaxis, np.newaxis, :]
+        # test_data = np.array(list)/1024
+        print("TrainData", train_data.shape)
+        print("TestData", test.shape)
+        print("ÄnomalyDta", anomaly_data.shape)
+        #学習用データ、テスト用データ、　異常検知のためのテストデータ
+        return train_data, test, anomaly_data
     #-----------------------------------------------------for Augmentation------------------------------------------------------------------
     def Augmentation_noise(self, data, rate=0.1):
         data = np.array(data)

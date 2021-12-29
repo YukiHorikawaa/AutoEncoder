@@ -1,0 +1,19 @@
+/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/oldSensorLoop/Denoising_AE_CNNepoch_400epockSize_512/20211226/Denoising_AE_CNNepoch_400epockSize_512070412.pth
+normalData:179
+Correct[%]95.53072625698324%
+anomalyData:179
+Correct[%]100.0%
+
+DVAEできてるやつ
+/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/oldSensor/VAEOKepoch_10epockSize_128/20211228/VAEOKepoch_10epockSize_128035434.pth
+model:VAE_cnn_net
+Z:z_dim = 5
+TH:0.82
+normalData:179
+Correct[%]98.88268156424581%
+anomalyData:179
+Correct[%]99.44134078212291%
+
+
+Newsensor
+/Users/yukihorikawa/Desktop/LAB_LAST/AutoEncoder/AutoEncoder/GoodModel/VAE_cnn_net3epoch_600epockSize_128/20211228/VAE_cnn_net3epoch_600epockSize_128073050.pth

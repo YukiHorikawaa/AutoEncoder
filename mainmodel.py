@@ -228,7 +228,44 @@ class Autoencoder_batchnorm(nn.Module):
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
         return decoded
+class Autoencoder_batchnorm2(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.enc1 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5)
+        self.enc2 = nn.Conv1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3)
+        self.flat = nn.Flatten(0, -1)
+        self.enc3 = nn.Linear(16, 3)
 
+        self.dec1 = nn.Linear(3,  16)
+        self.unflat = nn.Unflatten(0, (1, 1 ,16))
+        self.dec2 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 5, stride = 3, output_padding=1)
+        self.dec3 = nn.ConvTranspose1d(in_channels = 1, out_channels = 1, kernel_size = 7, stride = 5, padding = 1, output_padding=1)
+
+    def encoder(self, x):
+        x = F.relu(self.enc1(x))
+        BatchNorm((1, 1, 50))
+        # print(x.shape)
+        x = F.relu(self.enc2(x))
+        # BatchNorm((1, 1, 16))
+        # print(x.shape)
+        x = self.flat(x)
+        x = self.enc3(x)
+        return x
+    def decoder(self, x):
+        x = F.relu(self.dec1(x))
+        BatchNorm((16))
+        # print(x.shape)
+        x = self.unflat(x)
+        x = F.relu(self.dec2(x))
+        # BatchNorm((1, 1, 51))
+        # print(x.shape)
+        x = torch.sigmoid(self.dec3(x))
+        return x
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
 
 class VAE_cnn(nn.Module):
     """

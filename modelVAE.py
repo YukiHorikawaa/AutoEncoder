@@ -246,6 +246,7 @@ class VAE_cnn_net(nn.Module):
         x = self.unflat(x)
         x = F.relu(self.dec2(x))
         x = torch.sigmoid(self.dec3(x))
+        # x = torch.relu(self.dec3(x))
         return x
 
     def forward(self, x, device):
